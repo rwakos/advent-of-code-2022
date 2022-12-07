@@ -81,7 +81,7 @@ function calculateWeight(currentFolder, folders, pos = 0, acum = 0) {
 }
 
 const folders = Object.keys(folderStructure);
-// console.log(folderStructure);
+console.log(folderStructure);
 console.log("---------------------------------------------------------");
 const smallFolders = [];
 
@@ -106,17 +106,47 @@ for (let i = 0; i < folders.length; i++) {
 
 console.log(`PART 1: The total is: ${acum}`);
 
-//Part 2, simple overlap
+//Part 2
+//Find what is available
+const final = [];
+const finalKeys = Object.keys(folderStructure);
+for (let i = 0; i < finalKeys.length - 1; i++) {
+  //   debugger;
+  const currentFolder = finalKeys[i];
+  let acum = folderStructure[finalKeys[i]];
 
-// acum = 0;
-// for (let i = 0; i < array.length; i++) {
-//   const elvePair = array[i].split(COL_SEPARATOR);
-//   const elveFirst = elvePair[0];
-//   const elveSecond = elvePair[1];
+  for (let j = i + 1; j < finalKeys.length; j++) {
+    if (currentFolder === finalKeys[j].substr(0, currentFolder.length)) {
+      acum += folderStructure[finalKeys[j]];
+    } else {
+      folderStructure[currentFolder] = acum;
+      acum = 0;
+      break;
+    }
+  }
 
-//   if (overlaps(elveFirst, elveSecond)) {
-//     acum++;
-//   }
-// }
+  if (acum > 0) {
+    folderStructure[currentFolder] = acum;
+  }
 
+  final.push(folderStructure[currentFolder]);
+}
+
+console.log(folderStructure);
+
+const available = 70000000 - folderStructure["/"];
+const limit = 30000000 - available;
+
+final.sort((a, b) => a - b);
 // console.log(`PART 2: The total is: ${acum}`);
+let theNumber = 0;
+for (let i = 0; i < final.length; i++) {
+  console.log(final[i], limit);
+  if (final[i] > limit) {
+    theNumber = final[i];
+    break;
+  }
+}
+console.log("The answer", theNumber, limit, final);
+
+// bad 9494924
