@@ -1,0 +1,160 @@
+import { DATA, DATA_TEST } from "./data.js";
+const LINE_SEPARATOR = "\n";
+const COL_SEPARATOR = " ";
+const TREE_SEPARATOR = "___";
+
+const array = DATA.toString().split(LINE_SEPARATOR);
+const folderStructure = {};
+
+function buildDirectory(array) {
+  let tempDirectory = ["/"];
+
+  for (let i = 0; i < array.length; i++) {
+    const instruction = array[i].split(COL_SEPARATOR);
+
+    if (instruction[0] === "$") {
+      //console.log(instruction[1], instruction[2]);
+      //instruction
+      if (instruction[1] === "cd") {
+        if (instruction[2] === "/") {
+          //Need to reset the path
+          tempDirectory = ["/"];
+        } else if (instruction[2] === "..") {
+          //Need to go back a step
+          //   console.log("back", tempDirectory);
+          if (tempDirectory.length > 1) {
+            tempDirectory.pop();
+          }
+          //   console.log("back-after", tempDirectory);
+        } else {
+          //Add to the folder path
+          tempDirectory.push(instruction[2]);
+        }
+        //Add change current directory
+      } else if (instruction[1] === "ls") {
+        //We need to loop and clock the files ONLY
+        let folderWeight = 0;
+        // console.log(instruction[1], instruction[2]);
+        for (let j = i + 1; j < array.length; j++) {
+          const file = array[j].split(COL_SEPARATOR);
+
+          if (file[0] !== "$" && file[0] !== "dir") {
+            folderWeight += parseInt(file[0], 10);
+          } else if (file[0] === "$") {
+            i = j - 1;
+            break;
+          }
+        }
+        //We add to the folder structure
+        folderStructure[tempDirectory.join(TREE_SEPARATOR)] = folderWeight;
+
+        // addToFolder(tempDirectory, folderWeight);
+      }
+    }
+  }
+}
+
+let acum = 0;
+
+buildDirectory(array);
+
+function calculateWeight(parentFolder, folders, pos = 0, acum = 0) {
+  if (pos === folders.length) {
+    return acum;
+  }
+
+  const currentFolder = folders[pos];
+  let loop = true;
+
+  while (loop) {
+    if (pos === folders.length) {
+      return acum;
+    }
+    if (parentFolder === currentFolder.substr(0, parentFolder.length)) {
+      pos++;
+      acum += folderStructure[currentFolder];
+      acum += calculateWeight(currentFolder, folders, pos, acum);
+    } else {
+      loop = false;
+    }
+  }
+
+  return acum;
+}
+const acumFolders = [];
+const acumTotals = [];
+const folders = Object.keys(folderStructure);
+// console.log(folderStructure);
+console.log("---------------------------------------------------------");
+
+for (let i = 0; i < folders.length; i++) {
+  const total = calculateWeight(
+    folders[i],
+    folders,
+    i + 1,
+    folderStructure[folders[i]]
+  );
+
+  if (total > 0) {
+    if (total <= 100000) {
+      acum += total;
+    }
+  }
+}
+
+console.log(`PART 1: The total is: ${acum} / 1306611`);
+
+//@todo: PART 2 *****************************************************************
+function calculateWeight2(parentFolder, folders, pos = 0, acum = 0) {
+  if (pos === folders.length) {
+    return acum;
+  }
+
+  const currentFolder = folders[pos];
+  let loop = true;
+
+  while (loop) {
+    if (pos === folders.length) {
+      return acum;
+    }
+    if (parentFolder === currentFolder.substr(0, parentFolder.length)) {
+      pos++;
+      acum += folderStructure[currentFolder];
+      acum += calculateWeight2(currentFolder, folders, pos, acum);
+    } else {
+      loop = false;
+    }
+  }
+
+  return acum;
+}
+
+for (let i = 0; i < folders.length; i++) {
+  const total = calculateWeight2(folders[i], folders, i + 1);
+
+  if (total > 0) {
+    acumFolders.push({ [folders[i]]: total });
+    acumTotals.push(total);
+  }
+}
+console.log(acumFolders);
+console.log({ "/": 48381165, a: 94853, d: 24933642 });
+
+acumTotals.sort((a, b) => a - b);
+const sum = acumFolders.reduce((partialSum, a) => partialSum + a, 0);
+const available = 70000000 - sum;
+const needed = 30000000 - available;
+// console.log("Needed:", needed); // 6
+
+// acum = 30000000;
+for (let i = acumFolders.length - 1; i >= 0; i--) {
+  if (acumFolders[i] <= needed) {
+    // console.log("snmallest", acumFolders[i + 1]);
+    break;
+  }
+}
+/**
+ * 42111771,
+ *
+ *
+ */
