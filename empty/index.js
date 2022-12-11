@@ -18,7 +18,7 @@ let acum = 0;
 
 console.log(`PART 1: The total is: ${acum}`);
 
-//Part 2, simple overlap
+//Part 2**************************************************************************
 
 // acum = 0;
 // for (let i = 0; i < array.length; i++) {
