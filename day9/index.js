@@ -24,11 +24,6 @@ function fillPrevious() {
 function moveHead(x, y) {
   xHead = x;
   yHead = y;
-
-  if (xHead === 1 && yHead === 4) {
-    debugger;
-  }
-  console.log("Head", xHead, yHead);
 }
 
 function distanceBetween() {
@@ -45,23 +40,20 @@ function moveTail(x, y, xPrevHead, yPrevHead) {
   }
 
   const distance = distanceBetween();
-  console.log("Distance", distance);
   if (distance > 2) {
     xTail = xPrevHead;
     yTail = yPrevHead;
-    console.log("following diagonal head", xTail, yTail);
+    
     store(`${xTail}-${yTail}`);
     return;
   } else if (distance === 2 && (xTail === xHead || yTail === yHead)) {
     xTail = x !== 0 ? xTail + x : xTail;
     yTail = y !== 0 ? yTail + y : yTail;
 
-    console.log("Tail", xTail, yTail);
     store(`${xTail}-${yTail}`);
     return;
   }
 
-  console.log("should not move");
 }
 
 for (let i = 0; i < array.length; i++) {
@@ -95,7 +87,7 @@ for (let i = 0; i < array.length; i++) {
     }
   }
 }
-console.log(tailStepped);
+
 const singleStep = Object.keys(tailStepped);
 
 console.log(
@@ -103,16 +95,63 @@ console.log(
 );
 
 //Part 2**************************************************************************
+const snakeCurrentSteps = {};
+const snakeItems = [1,2,3,4,5,6,7,8,9];
 
-// acum = 0;
-// for (let i = 0; i < array.length; i++) {
-//   const elvePair = array[i].split(COL_SEPARATOR);
-//   const elveFirst = elvePair[0];
-//   const elveSecond = elvePair[1];
+function moveHead2(x, y) {
+  xHead = x;
+  yHead = y;
+}
 
-//   if (overlaps(elveFirst, elveSecond)) {
-//     acum++;
-//   }
-// }
+function moveTail2(x, y, xPrevHead, yPrevHead) {
+  if (xPrevHead === xTail && yPrevHead === yTail) {
+    return;
+  }
 
-// console.log(`PART 2: The total is: ${acum}`);
+  const distance = distanceBetween();
+  if (distance > 2) {
+    xTail = xPrevHead;
+    yTail = yPrevHead;
+    store(`${xTail}-${yTail}`);
+    return;
+  } else if (distance === 2 && (xTail === xHead || yTail === yHead)) {
+    xTail = x !== 0 ? xTail + x : xTail;
+    yTail = y !== 0 ? yTail + y : yTail;
+    store(`${xTail}-${yTail}`);
+    return;
+  }
+
+
+for (let i = 0; i < array.length; i++) {
+  const instruction = array[i].split(COL_SEPARATOR);
+  const direction = instruction[0];
+  const steps = parseInt(instruction[1], 10);
+
+  if (direction === "R") {
+    for (let j = 0; j < steps; j++) {
+      fillPrevious();
+      moveHead(xHead, yHead + 1);
+      moveTail(0, 1, xPrevHead, yPrevHead);
+    }
+  } else if (direction === "L") {
+    for (let j = 0; j < steps; j++) {
+      fillPrevious();
+      moveHead(xHead, yHead - 1);
+      moveTail(0, -1, xPrevHead, yPrevHead);
+    }
+  } else if (direction === "U") {
+    for (let j = 0; j < steps; j++) {
+      fillPrevious();
+      moveHead(xHead + 1, yHead);
+      moveTail(1, 0, xPrevHead, yPrevHead);
+    }
+  } else if (direction === "D") {
+    for (let j = 0; j < steps; j++) {
+      fillPrevious();
+      moveHead(xHead - 1, yHead);
+      moveTail(-1, 0, xPrevHead, yPrevHead);
+    }
+  }
+}
+console.log(tailStepped);
+// const singleStep = Object.keys(tailStepped);
